@@ -69,6 +69,7 @@ try:
         server.data_bank.set_holding_registers(0x14, Words(phase_powers[1]*10))     # Leistung L2
         server.data_bank.set_holding_registers(0x16, Words(phase_powers[2]*10))     # Leistung L3
         server.data_bank.set_holding_registers(0x28, Words(total_power*10))         # Leistung gesamt
+        # total_power is not required by Venus, it sums up the 3 phase values.
         time.sleep(0.1)
         pass  # Der Server läuft, bis er manuell gestoppt wird
 
