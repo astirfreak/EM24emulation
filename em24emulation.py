@@ -24,11 +24,7 @@ phase_voltages = [230.0, 230.0, 230.0]  # Volt
 phase_currents = [0.0, 0.0, 0.0]        # Ampere 
 phase_powers = [0.0, 0.0, 0.0]          # Watt
 
-# there are more registers for other values you might like to publish, 
-# see em24 ethernet cp.pdf 
-
-
-# converts python-numbers into two 16-Bit-Words for the Modbus-registers
+# converts python-numbers into two 16 bit words for the Modbus-registers
 def Words(value):
     value = int(value)
     lower_16 = value & 0xFFFF
@@ -43,10 +39,10 @@ def Words(value):
 class CustomDataBank(DataBank):
     def get_holding_registers(self, address, number, srv_info):
         if address==0x000B and number==1:
-            return [0x0675] # identification as Carlo Gavazzi-Counter
+            return [0x0675] # identification as Carlo Gavazzi counter
         return super().get_holding_registers(address, number, srv_info)
 
-# create Modbus-TCP-Server
+# create Modbus TCP server
 server = ModbusServer(host="0.0.0.0", port=502, no_block=True, data_bank=CustomDataBank())
 
 try:
@@ -58,7 +54,8 @@ try:
         # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx    
         # xx  get and fill your data here  xx
         # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
-        # and publish them afterwards:   
+        # and publish them afterwards:
+        # see em24 ethernet cp.pdf for further register adresses
         server.data_bank.set_holding_registers(0x00, Words(phase_voltages[0]*10))   # voltage L1
         server.data_bank.set_holding_registers(0x02, Words(phase_voltages[1]*10))   # voltage L2
         server.data_bank.set_holding_registers(0x04, Words(phase_voltages[2]*10))   # voltage L3
