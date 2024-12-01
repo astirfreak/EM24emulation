@@ -30,6 +30,7 @@ total_power = 0.0                       # Watt
 
 # konvertiert python-Zahlenwerte in zwei16-Bit-Werte für die Modbus-Register
 def Words(value):
+    value = int(value)
     lower_16 = value & 0xFFFF
     upper_16 = (value >> 16) & 0xFFFF
 
