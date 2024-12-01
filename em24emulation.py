@@ -23,12 +23,12 @@ import select
 phase_voltages = [230.0, 230.0, 230.0]  # Volt 
 phase_currents = [0.0, 0.0, 0.0]        # Ampere 
 phase_powers = [0.0, 0.0, 0.0]          # Watt
-total_power = 0.0                       # Watt
+
 # there are more registers for other values you might like to publish, 
 # see em24 ethernet cp.pdf 
 
 
-# konvertiert python-Zahlenwerte in zwei16-Bit-Werte für die Modbus-Register
+# converts python-numbers into two 16-Bit-Words for the Modbus-registers
 def Words(value):
     value = int(value)
     lower_16 = value & 0xFFFF
@@ -39,41 +39,40 @@ def Words(value):
         upper_16 = upper_16 - 0x10000 if upper_16 > 0x7FFF else upper_16
     return [lower_16,upper_16]
 
-# angepasste Datenbank zum Abfangen der Carlo Gavazzi Abfrage
+# customized data bank to catch special Carlo Gavazzi identification request
 class CustomDataBank(DataBank):
     def get_holding_registers(self, address, number, srv_info):
         if address==0x000B and number==1:
             return [0x0675] # Identifikation als Carlo Gavazzi-Zaehler
         return super().get_holding_registers(address, number, srv_info)
 
-# Erstelle den Modbus-TCP-Server
+# create Modbus-TCP-Server
 server = ModbusServer(host="0.0.0.0", port=502, no_block=True, data_bank=CustomDataBank())
 
 try:
-    print("Modbus-Server startet...")
+    print("starting Modbus-Server...")
     server.start()
 
-    print("Modbus-Server läuft. Drücke Strg+C zum Beenden.")
+    print("Modbus-Server running. Press Ctrl+C to terminate.")
     while True:
         # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx    
         # xx  get and fill your data here  xx
         # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
         # and publish them afterwards:   
-        server.data_bank.set_holding_registers(0x00, Words(phase_voltages[0]*10))   # Spannung L1
-        server.data_bank.set_holding_registers(0x02, Words(phase_voltages[1]*10))   # Spannung L2
-        server.data_bank.set_holding_registers(0x04, Words(phase_voltages[2]*10))   # Spannung L3
-        server.data_bank.set_holding_registers(0x0C, Words(phase_currents[0]*1000)) # Strom L1
-        server.data_bank.set_holding_registers(0x0E, Words(phase_currents[1]*1000)) # Strom L2
-        server.data_bank.set_holding_registers(0x10, Words(phase_currents[2]*1000)) # Strom L3
-        server.data_bank.set_holding_registers(0x12, Words(phase_powers[0]*10))     # Leistung L1
-        server.data_bank.set_holding_registers(0x14, Words(phase_powers[1]*10))     # Leistung L2
-        server.data_bank.set_holding_registers(0x16, Words(phase_powers[2]*10))     # Leistung L3
-        server.data_bank.set_holding_registers(0x28, Words(total_power*10))         # Leistung gesamt
+        server.data_bank.set_holding_registers(0x00, Words(phase_voltages[0]*10))   # voltage L1
+        server.data_bank.set_holding_registers(0x02, Words(phase_voltages[1]*10))   # voltage L2
+        server.data_bank.set_holding_registers(0x04, Words(phase_voltages[2]*10))   # voltage L3
+        server.data_bank.set_holding_registers(0x0C, Words(phase_currents[0]*1000)) # current L1
+        server.data_bank.set_holding_registers(0x0E, Words(phase_currents[1]*1000)) # current L2
+        server.data_bank.set_holding_registers(0x10, Words(phase_currents[2]*1000)) # current L3
+        server.data_bank.set_holding_registers(0x12, Words(phase_powers[0]*10))     # power L1
+        server.data_bank.set_holding_registers(0x14, Words(phase_powers[1]*10))     # power L2
+        server.data_bank.set_holding_registers(0x16, Words(phase_powers[2]*10))     # power L3        
         # total_power is not required by Venus, it sums up the 3 phase values.
         time.sleep(0.1)
-        pass  # Der Server läuft, bis er manuell gestoppt wird
+        pass  # server is running until stopped manualy
 
 except KeyboardInterrupt:
-    print("Modbus-Server wird beendet...")
+    print("terminating Modbus-Server ...")
     server.stop()
-    print("Modbus-Server gestoppt.")
+    print("Modbus-Server terminated.")
