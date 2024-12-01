@@ -43,7 +43,7 @@ def Words(value):
 class CustomDataBank(DataBank):
     def get_holding_registers(self, address, number, srv_info):
         if address==0x000B and number==1:
-            return [0x0675] # Identifikation als Carlo Gavazzi-Zaehler
+            return [0x0675] # identification as Carlo Gavazzi-Counter
         return super().get_holding_registers(address, number, srv_info)
 
 # create Modbus-TCP-Server
