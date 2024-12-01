@@ -20,10 +20,10 @@ import socket
 import select
 
 # values you like to publish, need to get filled somehow
-phase_voltages = [230.0, 230.0, 230.0]
-phase_currents = [0.0, 0.0, 0.0] 
-phase_powers = [0.0, 0.0, 0.0]
-total_power = 0.0
+phase_voltages = [230.0, 230.0, 230.0]  # Volt 
+phase_currents = [0.0, 0.0, 0.0]        # Ampere 
+phase_powers = [0.0, 0.0, 0.0]          # Watt
+total_power = 0.0                       # Watt
 # there are more registers for other values you might like to publish, 
 # see em24 ethernet cp.pdf 
 
@@ -51,29 +51,23 @@ server = ModbusServer(host="0.0.0.0", port=502, no_block=True, data_bank=CustomD
 try:
     print("Modbus-Server startet...")
     server.start()
-    server.data_bank.set_holding_registers(0x00, [2300,0])     # Spannung L1
-    server.data_bank.set_holding_registers(0x02, [2300,0])     # Spannung L2
-    server.data_bank.set_holding_registers(0x04, [2300,0])     # Spannung L3
-    server.data_bank.set_holding_registers(0x0C, [0,0])        # Strom L1
-    server.data_bank.set_holding_registers(0x0E, [0,0])        # Strom L2
-    server.data_bank.set_holding_registers(0x10, [0,0])        # Strom L3
-    server.data_bank.set_holding_registers(0x12, [0,0])        # Leistung L1
-    server.data_bank.set_holding_registers(0x14, [0,0])        # Leistung L2
-    server.data_bank.set_holding_registers(0x16, [0,0])        # Leistung L3
-    server.data_bank.set_holding_registers(0x28, [0,0])        # Leistung gesamt
 
     print("Modbus-Server läuft. Drücke Strg+C zum Beenden.")
-    while True:        
+    while True:
+        # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx    
+        # xx  get and fill your data here  xx
+        # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+        # and publish them afterwards:   
         server.data_bank.set_holding_registers(0x00, Words(phase_voltages[0]*10))   # Spannung L1
         server.data_bank.set_holding_registers(0x02, Words(phase_voltages[1]*10))   # Spannung L2
         server.data_bank.set_holding_registers(0x04, Words(phase_voltages[2]*10))   # Spannung L3
-        server.data_bank.set_holding_registers(0x0C, Words(phase_currents[0]))      # Strom L1
-        server.data_bank.set_holding_registers(0x0E, Words(phase_currents[1]))      # Strom L2
-        server.data_bank.set_holding_registers(0x10, Words(phase_currents[2]))      # Strom L3
+        server.data_bank.set_holding_registers(0x0C, Words(phase_currents[0]*1000)) # Strom L1
+        server.data_bank.set_holding_registers(0x0E, Words(phase_currents[1]*1000)) # Strom L2
+        server.data_bank.set_holding_registers(0x10, Words(phase_currents[2]*1000)) # Strom L3
         server.data_bank.set_holding_registers(0x12, Words(phase_powers[0]*10))     # Leistung L1
         server.data_bank.set_holding_registers(0x14, Words(phase_powers[1]*10))     # Leistung L2
         server.data_bank.set_holding_registers(0x16, Words(phase_powers[2]*10))     # Leistung L3
-        server.data_bank.set_holding_registers(0x28, Words(total_power))            # Leistung gesamt
+        server.data_bank.set_holding_registers(0x28, Words(total_power*10))         # Leistung gesamt
         time.sleep(0.1)
         pass  # Der Server läuft, bis er manuell gestoppt wird
 
