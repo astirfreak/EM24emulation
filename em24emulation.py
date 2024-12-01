@@ -71,8 +71,8 @@ try:
         server.data_bank.set_holding_registers(0x0E, Words(phase_currents[1]))      # Strom L2
         server.data_bank.set_holding_registers(0x10, Words(phase_currents[2]))      # Strom L3
         server.data_bank.set_holding_registers(0x12, Words(phase_powers[0]*10))     # Leistung L1
-        server.data_bank.set_holding_registers(0x14, Words(phase_powers[0]*10))     # Leistung L2
-        server.data_bank.set_holding_registers(0x16, Words(phase_powers[0]*10))     # Leistung L3
+        server.data_bank.set_holding_registers(0x14, Words(phase_powers[1]*10))     # Leistung L2
+        server.data_bank.set_holding_registers(0x16, Words(phase_powers[2]*10))     # Leistung L3
         server.data_bank.set_holding_registers(0x28, Words(total_power))            # Leistung gesamt
         time.sleep(0.1)
         pass  # Der Server läuft, bis er manuell gestoppt wird
